@@ -102,7 +102,7 @@ public class DatabaseInitializer implements CommandLineRunner {
         postArt2.setBlog(blogArt);
         postArt2.setAuthor(userArt);
 
-        User userIT = new User(null, "arefev.k.v", "password123", "Константин", "arefev.k.v@edu.mirea.ru", userRole);
+        User userIT = new User(null, "user_it", "password123", "user_it", "user@user.ru", userRole);
         userIT.setPassword(passwordEncoder.encode(userIT.getPassword()));
         userService.saveUser(userIT);
         Blog blogIT = userIT.getBlog();
