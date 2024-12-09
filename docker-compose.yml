@@ -1,0 +1,48 @@
+version: '3.9'
+services:
+  postgres:
+    image: 'postgres:17.0'
+    container_name: 'bndb'
+    ports:
+      - '5445:5432'
+    environment:
+      POSTGRES_DB: bsdb
+      POSTGRES_USER: bsdb
+      POSTGRES_PASSWORD: password
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "bsdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./blognest
+      dockerfile: Dockerfile
+    container_name: 'blognest-backend'
+    ports:
+      - '8080:8080'
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bsdb
+      SPRING_DATASOURCE_USERNAME: bsdb
+      SPRING_DATASOURCE_PASSWORD: password
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        - VITE_API_URL=http://localhost:8080
+        - NODE_ENV=development
+    container_name: 'frontend'
+    ports:
+      - '5173:80'
+    depends_on:
+      - backend
+    restart: "no"
+
+volumes:
+  postgres_data:
